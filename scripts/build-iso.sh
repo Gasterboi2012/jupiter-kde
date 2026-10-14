@@ -18,8 +18,27 @@ esac
 
 BUILD="$ROOT/build"
 mkdir -p "$BUILD/repo" "$BUILD/result"
+
+# Check if we're running as root (podman needs root or rootless with specific setup)
+if [ "$(id -u)" -ne 0 ]; then
+    if ! command -v podman &>/dev/null && ! command -v docker &>/dev/null; then
+        echo "error: podman or docker not found" >&2
+        exit 1
+    fi
+fi
+
 IMAGE="registry.fedoraproject.org/fedora:${FEDORA_RELEASE}"
 PODMAN="${PODMAN:-sudo podman}"
+
+# Check if the Fedora image exists locally (saves time if it does)
+echo "==> Checking for Fedora image: $IMAGE"
+if ! $PODMAN image inspect "$IMAGE" &>/dev/null; then
+    echo "error: Fedora image not found locally. Pulling..." >&2
+    $PODMAN pull "$IMAGE" || {
+        echo "error: failed to pull Fedora image" >&2
+        exit 1
+    }
+fi
 
 # shellcheck disable=SC2086  # PODMAN may contain several words ("sudo podman")
 $PODMAN run --rm --privileged --security-opt label=disable \
@@ -32,7 +51,10 @@ $PODMAN run --rm --privileged --security-opt label=disable \
     -v "$BUILD/repo:/jupiter-repo" \
     -v "$BUILD/result:/build/result" \
     "$IMAGE" \
-    bash /src/scripts/container-build.sh
+    bash /src/scripts/container-build.sh || {
+    echo "error: container build failed" >&2
+    exit 1
+}
 
 if [[ "$STAGE" != "rpms" ]]; then
     iso="$(find "$BUILD/result" -name '*.iso' -print -quit)"
@@ -43,4 +65,10 @@ if [[ "$STAGE" != "rpms" ]]; then
     final="$BUILD/result/jupiter-${DISTRO_VERSION}-x86_64.iso"
     [[ "$iso" == "$final" ]] || mv "$iso" "$final"
     echo "ISO: $final"
+    
+    # Verify the ISO is a valid ISO image
+    if ! file "$final" | grep -q "ISO 9660"; then
+        echo "error: $final does not appear to be a valid ISO image" >&2
+        exit 1
+    fi
 fi
