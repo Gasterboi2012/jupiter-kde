@@ -9,6 +9,8 @@ Source0:        jupiter-installer-%{version}.tar.gz
 
 BuildRequires:  python3-devel
 BuildRequires:  pyproject-rpm-macros
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pytest-asyncio
 
 Requires:       python3-textual
 Requires:       NetworkManager

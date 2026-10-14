@@ -81,13 +81,22 @@ def test_branding_spec_installs_every_source_file_it_ships():
 
 def test_package_policy_is_kde_native_with_gnome_disk_utility_exception():
     pkgs = packages_section()
-    assert "plasma-desktop" in pkgs and "sddm" in pkgs
+    assert "plasma-desktop" in pkgs and "plasma-login-manager" in pkgs
+    assert "sddm" not in pkgs
+    for removed in ("okular", "kcalc"):
+        assert removed not in pkgs, removed
     gnome = [p for p in pkgs if p.startswith("gnome") and p != "gnome-disk-utility"]
     assert gnome == [], f"unexpected GNOME packages: {gnome}"
     assert "gnome-disk-utility" in pkgs
     assert "helium-bin" in pkgs
     assert "-firefox" in pkgs
     assert "firefox" not in [p for p in pkgs if not p.startswith("-")]
+
+
+def test_live_kickstart_enables_plasma_login_manager_not_sddm():
+    services = [line for line in KS.read_text().splitlines() if line.startswith("services")]
+    assert services and "plasmalogin" in services[0]
+    assert "sddm" not in services[0]
 
 
 def test_live_kickstart_ships_jupiter_packages_and_repos():

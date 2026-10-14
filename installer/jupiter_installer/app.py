@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import subprocess
 import sys
 import threading
 
@@ -299,7 +300,7 @@ class InstallScreen(Screen):
         try:
             text = ks.render_kickstart(app.answers, ks.hash_password(app.answers.password))
             code = system.run_install(text, dry_run=app.dry_run, emit=self._emit)
-        except (ks.ValidationError, system.InstallerError, OSError) as exc:
+        except (ks.ValidationError, system.InstallerError, OSError, subprocess.CalledProcessError) as exc:
             self._emit(f"Error: {exc}")
             code = 1
         self.app.call_from_thread(self._finish, code)

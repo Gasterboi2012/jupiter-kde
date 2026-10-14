@@ -5,8 +5,8 @@ Version **0.1**. It is built from this repository.
 
 ## What ships
 
-- **Desktop:** KDE Plasma (SDDM login), minimal set of KDE-native apps:
-  Dolphin, Konsole, Kate, Okular, Gwenview, Ark, Spectacle, KCalc,
+- **Desktop:** KDE Plasma (Plasma Login Manager), minimal set of KDE-native apps:
+  Dolphin, Konsole, Kate, Gwenview, Ark, Spectacle,
   KDE Partition Manager, Discover, System Monitor, Info Center.
 - **Exception:** `gnome-disk-utility` is included on purpose.
 - **Browser:** Helium (`helium-bin` from the `imput/helium` COPR), set as default.

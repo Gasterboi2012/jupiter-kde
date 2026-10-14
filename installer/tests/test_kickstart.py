@@ -34,6 +34,12 @@ def test_nvidia_choice_installs_nvidia_open_from_rpmfusion():
     assert "kmod-nvidia\n" not in text and "akmod-nvidia " not in text
 
 
+def test_install_enables_plasma_login_manager():
+    text = ks.render_kickstart(answers(), HASH)
+    assert "services --enabled=NetworkManager,plasmalogin" in text
+    assert "sddm" not in text
+
+
 def test_plymouth_theme_is_set_in_every_install():
     assert "plymouth-set-default-theme -R jupiter" in ks.render_kickstart(answers(), HASH)
 

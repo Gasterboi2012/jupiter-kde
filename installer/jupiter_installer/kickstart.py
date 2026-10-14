@@ -147,7 +147,7 @@ user --name={username} --groups=wheel --iscrypted --password={password_hash}
 
 selinux --enforcing
 firewall --enabled
-services --enabled=NetworkManager,sddm
+services --enabled=NetworkManager,plasmalogin
 
 reboot --eject
 

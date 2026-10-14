@@ -10,7 +10,7 @@ network --bootproto=dhcp --device=link --activate --onboot=yes
 rootpw --lock
 selinux --enforcing
 firewall --enabled --service=mdns
-services --enabled=NetworkManager,sddm,livesys,livesys-late
+services --enabled=NetworkManager,plasmalogin,livesys,livesys-late
 
 # Live image root filesystem size (MB).
 part / --size=12288 --fstype=ext4
@@ -37,7 +37,8 @@ plymouth-plugin-script
 openssl
 
 # KDE Plasma desktop (minimal)
-sddm
+plasma-login-manager
+kcm-plasmalogin
 plasma-desktop
 plasma-workspace
 plasma-nm
@@ -54,11 +55,9 @@ google-noto-sans-fonts
 konsole
 dolphin
 kate
-okular
 gwenview
 ark
 spectacle
-kcalc
 partitionmanager
 ffmpegthumbs
 kdegraphics-thumbnailers
