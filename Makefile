@@ -6,7 +6,7 @@ PYTHON ?= python3
 .PHONY: help art rpms iso all test test-installer test-config clean
 
 help: ## Show available targets
-	@grep -E '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-16s %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z_-]+:.*## ' Makefile | awk -F':.*## ' '{printf "  %-16s %s\n", $$1, $$2}'
 
 art: ## Regenerate the placeholder splash PNG (replace the file with real art later)
 	$(PYTHON) scripts/generate-placeholders.py
