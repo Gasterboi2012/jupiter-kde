@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
-"""Generate placeholder PNG artwork for Jupiter.
-
-Writes packaging/jupiter-branding/files/plymouth/jupiter/logo.png. Replace that
-file (same name and size guidance: ~512x512, transparent background) with the
-real splash logo; the Plymouth script centers whatever image it finds.
-Requires Pillow (python3-pillow on Fedora).
-"""
+"""Generates placeholder artwork for Jupiter distribution assets."""
 
 from pathlib import Path
 

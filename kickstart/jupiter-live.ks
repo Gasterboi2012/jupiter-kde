@@ -54,8 +54,8 @@ google-noto-sans-fonts
 # KDE-native applications
 konsole
 dolphin
-kate
-gwenview
+kwrite
+mpv
 ark
 spectacle
 partitionmanager
