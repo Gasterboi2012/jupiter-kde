@@ -47,18 +47,110 @@ Version **0.1**. It is built from this repository.
 
 ## Building
 
-Requirements: a Linux host with `sudo` and `podman`, and network access.
+### Requirements
+
+- A Linux host with `podman` and `sudo` (the ISO step runs privileged).
+- Network access (the container pulls `registry.fedoraproject.org/fedora:<FEDORA_RELEASE>`
+  and downloads packages from the Fedora, RPM Fusion and COPR mirrors).
+- Free disk space: the live root is 12 GB and the build needs scratch space on top of it.
+  Plan for tens of GB free.
+- `make` (GNU make). Python 3 with `pytest`, `pytest-asyncio` and `textual` is only needed for `make test`.
+
+Install the host tools on Fedora:
 
 ```sh
-make test     # installer and config tests (no Fedora needed)
-make rpms     # build jupiter-branding and jupiter-installer RPMs -> build/repo
-make iso      # build the live ISO -> build/result/jupiter-0.1-x86_64.iso
-make clean
+sudo dnf install -y podman make python3-pytest python3-pytest-asyncio python3-textual
 ```
 
-The build runs in a `fedora:<FEDORA_RELEASE>` container. It uses `livemedia-creator`
-(package `lorax-lmc-novirt`) with `--no-virt`. Test the ISO in a VM before you
-distribute it.
+### Step by step
+
+Run all commands from the repository root.
+
+1. **Run the tests** (no Fedora or podman needed):
+
+   ```sh
+   make test
+   ```
+
+   Expect `35 passed` for the installer and `10 passed` for the config checks.
+   Stop if anything fails.
+
+2. **Build the RPMs** (fast check of the packaging):
+
+   ```sh
+   make rpms
+   ```
+
+   This runs `scripts/build-iso.sh rpms` and builds `jupiter-branding` and
+   `jupiter-installer` inside the Fedora container. The RPMs are copied to
+   `build/repo/` and indexed there with `createrepo_c`. The kickstart reads them
+   from that directory through `file:///jupiter-repo`.
+
+3. **Build the live ISO**:
+
+   ```sh
+   make iso
+   ```
+
+   This runs `scripts/build-iso.sh all`, which does step 2 again and then:
+   - validates `kickstart/jupiter-live.ks` with `ksvalidator` for `F<FEDORA_RELEASE>`
+     (a bad kickstart fails here, before any image is built), then
+   - runs `livemedia-creator --make-iso --no-virt` to install the kickstart into a
+     chroot and produce the live image.
+
+   Output: `build/result/jupiter-0.1-x86_64.iso`. The script prints `ISO: <path>`
+   when it succeeds and exits non-zero if no ISO was produced.
+
+4. **Check the result**: the ISO is the last line printed. Confirm the file exists:
+
+   ```sh
+   ls -lh build/result/jupiter-0.1-x86_64.iso
+   ```
+
+### Build options
+
+- **Rootful podman without sudo**: if your user runs podman as root already, skip the
+  sudo wrapper: `PODMAN=podman make iso` (set the variable in the environment).
+- **Rebuild after changes**: `make rpms` rebuilds the two RPMs from the current source.
+  `make iso` always rebuilds the RPMs first, then the ISO. To start clean, run
+  `make clean` (it removes `build/`, including the RPM repo and previous ISOs).
+- **Change the release**: edit `FEDORA_RELEASE` in `distro.conf`. The container image,
+  `ksvalidator` and `livemedia-creator --releasever` all follow it.
+
+### Where things go
+
+| Path | Contents |
+| --- | --- |
+| `build/repo/` | Built RPMs plus repo metadata (mounted into the container as `/jupiter-repo`) |
+| `build/result/` | `livemedia-creator` output; the final ISO is `jupiter-<version>-x86_64.iso` |
+| `build/` | Everything above. Git ignores it. |
+
+Inside the container, `livemedia-creator` writes its temporary files to `/var/tmp/lmc`.
+This is in the container, not in `build/`.
+
+### Troubleshooting
+
+- **`ksvalidator` error**: the message names the line in `kickstart/jupiter-live.ks`.
+  Fix that line and rerun `make iso`.
+- **`dnf builddep` or `rpmbuild` error**: the failing spec is named in the output.
+  Run `make rpms` again after fixing the spec or the source tarball contents.
+- **Helium packages not found**: the COPR `baseurl` in the kickstart is unverified.
+  Check the `imput/helium` COPR page for the correct Fedora 44 repo URL.
+- **Failed `%post` in the live image**: the log is in the image at `/root/jupiter-live-post.log`.
+- **No ISO produced**: check the `livemedia-creator` output above the error. The
+  `livemedia-creator` flags are from its documentation and have not been run against
+  this kickstart.
+
+### Test the ISO
+
+Boot the ISO in a VM before you distribute it. Example with QEMU and KVM:
+
+```sh
+qemu-system-x86_64 -enable-kvm -m 4096 -smp 2 -cdrom build/result/jupiter-0.1-x86_64.iso
+```
+
+For the installer, use a VM disk (for example `qemu-img create -f qcow2 disk.qcow2 40G`)
+so the erase step runs against the disk you intend to test.
 
 ## Installing
 
