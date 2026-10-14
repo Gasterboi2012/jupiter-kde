@@ -6,7 +6,7 @@ set -euo pipefail
 : "${FEDORA_RELEASE:?}" "${DISTRO_VERSION:?}" "${ISO_VOLID:?}" "${STAGE:?}"
 
 echo "==> installing build tools"
-dnf -y install rpm-build rpmdevtools createrepo_c pykickstart lorax-lmc-novirt tar gzip >/dev/null
+dnf -y install rpm-build rpmdevtools createrepo_c pykickstart lorax-lmc-novirt tar gzip
 
 TOP=/tmp/rpmbuild
 rm -rf "$TOP"
