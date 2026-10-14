@@ -1,0 +1,44 @@
+Screen {
+    align: center middle;
+}
+
+.progress {
+    width: 100%;
+    text-align: center;
+    color: $accent;
+    text-style: bold;
+    margin-bottom: 1;
+}
+
+.banner {
+    color: $accent;
+    text-style: bold;
+    margin-bottom: 1;
+}
+
+.panel {
+    width: 74;
+    height: auto;
+    max-height: 90%;
+    border: round $accent;
+    padding: 1 2;
+}
+
+.summary {
+    margin-bottom: 1;
+}
+
+.error {
+    color: $error;
+    height: auto;
+}
+
+.nav {
+    width: 74;
+    height: auto;
+    margin-top: 1;
+}
+
+#wifi, #disks {
+    height: 10;
+}

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Install Jupiter
+GenericName=System Installer
+Comment=Install Jupiter to this computer
+Exec=konsole -e sudo /usr/bin/jupiter-installer
+Icon=jupiter-logo
+Terminal=false
+Categories=System;
+Keywords=install;installer;jupiter;

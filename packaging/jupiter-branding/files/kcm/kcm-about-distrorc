@@ -1,0 +1,6 @@
+# Read by KDE Info Center's "About this system" page (/etc/xdg/kcm-about-distrorc).
+# Change these values to rebrand the distribution.
+[General]
+Name=Jupiter
+Version=0.1
+LogoPath=/usr/share/icons/hicolor/scalable/apps/jupiter-logo.svg
