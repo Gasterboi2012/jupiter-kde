@@ -9,7 +9,7 @@ echo "==> installing build tools"
 dnf -y install rpm-build rpmdevtools createrepo_c pykickstart lorax-lmc-novirt tar gzip
 
 TOP=/tmp/rpmbuild
-rm -rf "$TOP"
+trap "rm -rf \"$TOP\"" EXIT
 mkdir -p "$TOP"/{SOURCES,SPECS,BUILD,RPMS,SRPMS}
 
 # make_tarball <name-version> <source-dir>: archive the dir under <name-version>/
@@ -35,7 +35,7 @@ build_rpms() {
     cp /src/packaging/jupiter-installer/jupiter-installer.spec "$TOP/SPECS/"
     build_rpm "$TOP/SPECS/jupiter-installer.spec"
 
-    find "$TOP/RPMS" -name '*.rpm' -exec cp {} /jupiter-repo/ \;
+    cp "$TOP/RPMS"/*.rpm /jupiter-repo/
     createrepo_c --update /jupiter-repo
 }
 
